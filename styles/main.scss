@@ -232,7 +232,7 @@ body {
   .ant-dropdown-menu-item {
     font-size: 16px !important;
     color: var(--text-subdued,#b3b3b3) !important;
-    padding: 10px 30px !important;
+    padding: 8px 30px !important;
 
     &:hover {
       background-color: rgba(62,62,62,1) !important;
@@ -243,11 +243,10 @@ body {
     color: var(--text-subdued,#626262) !important;
   }
 
+  .ant-dropdown-menu-item-divider {
+    background-color: #626262 !important;
+  }
 }
 
-.ant-dropdown-menu-item-divider {
-  border-color: white !important;
-  color: white !important;
-}
 
 

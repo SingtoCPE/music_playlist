@@ -1,5 +1,11 @@
-import Image from "next/image";
+"use client";
+
+import Playlist from "./playlist/page";
 
 export default function Home() {
-  return <main></main>;
+  return (
+    <div>
+      <Playlist />
+    </div>
+  );
 }

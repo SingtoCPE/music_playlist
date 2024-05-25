@@ -10,6 +10,10 @@ body {
 
   background: rgb(24,24,24);
   background: linear-gradient(180deg, rgba(24,24,24,0.18393294817927175) 0%, rgba(62,62,62,1) 0%, rgba(33,33,33,1) 28%, rgba(24,24,24,1) 100%);
+
+  @media screen and (max-width:992px) {
+    height: auto !important;
+  }
 }
 
 .txt_white {

@@ -18,7 +18,7 @@ import dayjs from "dayjs";
 import playlistApi from "../../../../api/playlist";
 
 export default function Table(props) {
-  const { playList, getPlaylist, setIsModalOpen, setIdDelete } = props;
+  const { playList, setIsModalOpen, setIdDelete } = props;
 
   const items = [
     {

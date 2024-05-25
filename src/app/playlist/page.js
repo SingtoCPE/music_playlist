@@ -88,6 +88,7 @@ export default function Playlist() {
 
   useEffect(() => {
     getPlaylist();
+    getOneMusic();
   }, []);
 
   useEffect(() => {
@@ -157,17 +158,17 @@ export default function Playlist() {
 
     playlistApi.createPlaylistItem(newPayload).then((response) => {
       if (response.response_code === "200") {
-        updatePlaylist(musicId);
+        const newPayload = {
+          total: playList.total + 1,
+          longTerm: playList.longTerm + calculateTime(musicId),
+        };
+
+        updatePlaylist(newPayload);
       }
     });
   };
 
-  const updatePlaylist = (musicId) => {
-    const newPayload = {
-      total: playList.total + 1,
-      longTerm: playList.longTerm + calculateTime(musicId),
-    };
-
+  const updatePlaylist = (newPayload) => {
     playlistApi.update(playList.id, newPayload).then((response) => {
       if (response.response_code === "200") {
         getPlaylist();
@@ -187,18 +188,23 @@ export default function Playlist() {
     let hours = Math.floor(secToMin / 60);
     let minutes = (secToMin % 60).toString().substring(0, 2);
 
-    if (minutes.length === 1) {
-      minutes = minutes + "0";
-    }
-
     return `${hours} hr ${minutes} min`;
   };
 
   const submitConfirmModal = () => {
     playlistApi.removePlaylistItem(idDelete).then((response) => {
       if (response.response_code === "200") {
+        const findItem = playList.playlistItems.find(
+          (data) => data.id === idDelete
+        );
+
+        const newPayload = {
+          total: playList.total - 1,
+          longTerm: playList.longTerm - calculateTime(findItem.music.id),
+        };
+
+        updatePlaylist(newPayload);
         setIsModalOpen(false);
-        getPlaylist();
       }
     });
   };

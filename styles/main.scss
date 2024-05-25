@@ -2,6 +2,8 @@ body {
   margin: 0px 0px;
   margin: 24px 24px;
 
+  height: 140vh !important;
+
   font-weight: 500;
 
   color: var(--text-subdued,#b3b3b3);
@@ -199,11 +201,16 @@ body {
 .box_input {
   background-color: transparent;
   border-color: transparent;
+  width: 100% !important;
 
   .ant-input-prefix {
     color: var(--text-subdued,#b3b3b3);
     font-size: 20px !important;
     margin-right: 12px !important;
+  }
+
+  input {
+    color: var(--text-subdued,#b3b3b3) !important;
   }
   
   ::placeholder {
@@ -213,6 +220,9 @@ body {
 
   &:hover {
     border-color: #55ba54 !important;
+    input {
+      color: black !important;
+    }
   }
 }
 
@@ -225,8 +235,6 @@ body {
 }
 
 .ant-dropdown-menu {
-  width: 230px !important;
-
   background-color: rgb(53, 53, 53) !important;
 
   .ant-dropdown-menu-item {
@@ -236,17 +244,80 @@ body {
 
     &:hover {
       background-color: rgba(62,62,62,1) !important;
+      color: white !important;
+      font-size: 16.5px !important;
     }
   }
 
   .ant-dropdown-menu-item-disabled {
     color: var(--text-subdued,#626262) !important;
+    &:hover {
+      font-size: 16px !important;
+      color: #626262 !important;
+    }
+    
   }
 
   .ant-dropdown-menu-item-divider {
     background-color: #626262 !important;
   }
 }
+
+.dropdown_more {
+  width: 230px !important;
+}
+
+.dropdown_search {
+  width: 350px !important;
+  height: 450px !important;
+  overflow-y: scroll;
+
+  .ant-dropdown-menu-item {
+    padding: 10px 16px !important;
+
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+    border-bottom: 1px solid #626262;
+  }
+}
+
+.btn_action {
+  background-color: transparent;
+  color: white !important;
+  border-color: transparent;
+
+  &:hover {
+    color: white !important;
+    border-color: white !important;
+    background-color: transparent !important;
+  }
+}
+
+.empty {
+  margin-top: 100px !important;
+  padding-bottom: 100px;
+  text-align: center;
+}
+
+.ant-modal-content {
+  background: rgb(24,24,24) !important;
+  color: white;
+
+  .ant-btn-primary {
+    background-color: red !important;
+  }
+
+  .anticon-close {
+    color: white !important;
+  }
+}
+
+.ant-modal {
+  padding-bottom: 0px !important;
+  box-shadow: rgba(255, 255, 255, 0.24) 0px 3px 8px;
+}
+
+
 
 
 

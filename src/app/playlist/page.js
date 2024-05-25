@@ -4,72 +4,22 @@ import React, { useEffect, useState } from "react";
 
 // material ui
 import { Button, Input, Dropdown } from "antd";
+import {
+  EllipsisOutlined,
+  SearchOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 
-import { styled } from "@mui/material/styles";
-import { Switch } from "@mui/material";
-
-import { EllipsisOutlined, SearchOutlined } from "@ant-design/icons";
+// api
+import musicApi from "../../../api/music";
+import playlistApi from "../../../api/playlist";
 
 // compoentns
 import Table from "./components/table";
+import Switch from "./components/switch";
+import ModalConfirm from "./components/modalConfirm";
 
 export default function Playlist() {
-  const IOSSwitch = styled((props) => (
-    <Switch
-      focusVisibleClassName=".Mui-focusVisible"
-      disableRipple
-      {...props}
-    />
-  ))(({ theme }) => ({
-    width: 42,
-    height: 26,
-    padding: 0,
-    "& .MuiSwitch-switchBase": {
-      padding: 0,
-      margin: 2,
-      transitionDuration: "300ms",
-      "&.Mui-checked": {
-        transform: "translateX(16px)",
-        color: "#fff",
-        "& + .MuiSwitch-track": {
-          backgroundColor:
-            theme.palette.mode === "dark" ? "#2ECA45" : "#65C466",
-          opacity: 1,
-          border: 0,
-        },
-        "&.Mui-disabled + .MuiSwitch-track": {
-          opacity: 0.5,
-        },
-      },
-      "&.Mui-focusVisible .MuiSwitch-thumb": {
-        color: "#33cf4d",
-        border: "6px solid #fff",
-      },
-      "&.Mui-disabled .MuiSwitch-thumb": {
-        color:
-          theme.palette.mode === "light"
-            ? theme.palette.grey[100]
-            : theme.palette.grey[600],
-      },
-      "&.Mui-disabled + .MuiSwitch-track": {
-        opacity: theme.palette.mode === "light" ? 0.7 : 0.3,
-      },
-    },
-    "& .MuiSwitch-thumb": {
-      boxSizing: "border-box",
-      width: 22,
-      height: 22,
-    },
-    "& .MuiSwitch-track": {
-      borderRadius: 26 / 2,
-      backgroundColor: theme.palette.mode === "light" ? "#E9E9EA" : "#39393D",
-      opacity: 1,
-      transition: theme.transitions.create(["background-color"], {
-        duration: 500,
-      }),
-    },
-  }));
-
   const items = [
     {
       key: "1",
@@ -120,6 +70,138 @@ export default function Playlist() {
   ];
 
   const [checked, setChecked] = useState(false);
+  const [dropdownTrigger, setDropdownTrigger] = useState(false);
+
+  // for get playlist
+  const [payload, setPayload] = useState({ search: "" });
+  const [isSearch, setIsSearch] = useState(false);
+
+  const [musicList, setMusicList] = useState([]);
+  const [playList, setPlayList] = useState([]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalInfo, setIsModalInfo] = useState({
+    text: "Do you want to delete this music ?",
+  });
+
+  const [idDelete, setIdDelete] = useState("");
+
+  useEffect(() => {
+    getPlaylist();
+  }, []);
+
+  useEffect(() => {
+    if (isSearch) {
+      getOneMusic();
+    }
+  }, [isSearch]);
+
+  const getPlaylist = () => {
+    playlistApi.getOne(1).then((response) => {
+      if (response.response_code === "200") {
+        setPlayList(response.data);
+      }
+    });
+  };
+
+  const getOneMusic = () => {
+    musicApi.searchMusic(payload).then((response) => {
+      if (response.response_code === "200") {
+        const newResponse = response.data.map((data) => ({
+          length: data.length,
+          key: data.id,
+          label: (
+            <div>
+              <div className="j_between item_music_top">
+                <div className="txt_white">{data.title}</div>
+                {/* <Button
+                  shape="circle"
+                  size="small"
+                  color="green"
+                  icon={<PlusOutlined className="pointer" />}
+                ></Button> */}
+              </div>
+              <div className="j_between item_music_bottom">
+                <div>{data.artist}</div>
+                <div>{data.album}</div>
+              </div>
+            </div>
+          ),
+        }));
+
+        setMusicList(newResponse);
+        setIsSearch(false);
+
+        setDropdownTrigger(true);
+      } else {
+        setDropdownTrigger(false);
+      }
+    });
+  };
+
+  const onFilterChange = (value) => {
+    setPayload({ search: value });
+    setIsSearch(true);
+  };
+
+  const onSelectMusic = (e) => {
+    addMusicToPlaylist(e.key);
+  };
+
+  const addMusicToPlaylist = (musicId) => {
+    const newPayload = {
+      musicId: musicId,
+      playlistId: playList.id,
+      playing: false,
+    };
+
+    playlistApi.createPlaylistItem(newPayload).then((response) => {
+      if (response.response_code === "200") {
+        updatePlaylist(musicId);
+      }
+    });
+  };
+
+  const updatePlaylist = (musicId) => {
+    const newPayload = {
+      total: playList.total + 1,
+      longTerm: playList.longTerm + calculateTime(musicId),
+    };
+
+    playlistApi.update(playList.id, newPayload).then((response) => {
+      if (response.response_code === "200") {
+        getPlaylist();
+      }
+    });
+  };
+
+  const calculateTime = (musicId) => {
+    const findMusic = musicList.find((data) => data.key == musicId);
+
+    return parseFloat(findMusic.length);
+  };
+
+  const calculateHour = (second) => {
+    let secToMin = parseInt(second) / 60;
+
+    let hours = Math.floor(secToMin / 60);
+    let minutes = (secToMin % 60).toString().substring(0, 2);
+
+    if (minutes.length === 1) {
+      minutes = minutes + "0";
+    }
+
+    return `${hours} hr ${minutes} min`;
+  };
+
+  const submitConfirmModal = () => {
+    playlistApi.removePlaylistItem(idDelete).then((response) => {
+      if (response.response_code === "200") {
+        setIsModalOpen(false);
+        getPlaylist();
+      }
+    });
+  };
 
   return (
     <>
@@ -132,11 +214,11 @@ export default function Playlist() {
           />
           <div className="box_detail">
             <div className="txt_detail txt_white">PLAYLIST</div>
-            <div className="txt_diving txt_white">Driving</div>
-            <div className="txt_detail">Pop jams for the car</div>
+            <div className="txt_diving txt_white">{playList.title}</div>
+            <div className="txt_detail">{playList.description}</div>
             <div className="txt_detail">
-              Create by <span className="txt_white">Singto</span> · 22 songs, 1
-              hr 38 min
+              Create by <span className="txt_white">{playList.createBy}</span> ·{" "}
+              {playList.total} songs, {calculateHour(playList.longTerm)}
             </div>
             <div className="wrapper_btn txt_detail">
               <div className="wrapper_btn_play">
@@ -146,7 +228,9 @@ export default function Playlist() {
                   menu={{
                     items,
                   }}
+                  // trigger={["dropdownTrigger", "click", "hover"]}
                   placement="bottomLeft"
+                  overlayClassName="dropdown_more"
                 >
                   <Button
                     shape="circle"
@@ -168,23 +252,38 @@ export default function Playlist() {
       {/* table */}
       <div className="wrapper_filter">
         <div className="wrapper_filter_input">
-          <Input
-            className="box_input"
-            size="large"
-            placeholder="Filter"
-            prefix={<SearchOutlined />}
-          />
+          <Dropdown
+            overlayClassName="dropdown_search"
+            menu={{
+              items: musicList,
+              onClick: onSelectMusic,
+            }}
+          >
+            <Input
+              className="box_input"
+              size="large"
+              placeholder="Filter"
+              prefix={<SearchOutlined />}
+              onChange={(event) => onFilterChange(event.target.value)}
+            />
+          </Dropdown>
         </div>
         <div className="wrapper_switch_download">
-          Download{" "}
-          <IOSSwitch
-            sx={{ m: 1 }}
-            // checked={checked}
-            // onChange={({ target: { checked } }) => setChecked(checked)}
-          />
+          Download <Switch />
         </div>
       </div>
-      <Table />
+      <Table
+        playList={playList}
+        getPlaylist={getPlaylist}
+        setIsModalOpen={setIsModalOpen}
+        setIdDelete={setIdDelete}
+      />
+      <ModalConfirm
+        isModalOpen={isModalOpen}
+        modalInfo={modalInfo}
+        submitConfirmModal={submitConfirmModal}
+        setIsModalOpen={setIsModalOpen}
+      />
     </>
   );
 }

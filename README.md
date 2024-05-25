@@ -40,3 +40,11 @@ https://music-playlist-six.vercel.app/
 # url for test API
 
 https://services.about-me.site/
+
+# url github client
+
+https://github.com/SingtoCPE/music_playlist.git
+
+# url github API
+
+https://github.com/SingtoCPE/music_playlist_services.git

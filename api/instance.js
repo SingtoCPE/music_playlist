@@ -6,8 +6,8 @@ const apiInstance = {
 
 export const createAxios = () => {
   const api = axios.create({
-    // baseURL: "https://services.about-me.site/",
-    baseURL: "http://localhost:8081/",
+    baseURL: "https://services.about-me.site/",
+    // baseURL: "http://localhost:8081/",
   });
 
   api.interceptors.request.use((config) => {
